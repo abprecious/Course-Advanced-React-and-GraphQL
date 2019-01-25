@@ -60,6 +60,10 @@ class Reset extends Component {
                   password: "",
                   confirmPassword: ""
                 });
+                //redirect them to account page
+                Router.push({
+                  pathname: "/me"
+                });
               }}
             >
               <fieldset disabled={loading} aria-busy={loading}>
