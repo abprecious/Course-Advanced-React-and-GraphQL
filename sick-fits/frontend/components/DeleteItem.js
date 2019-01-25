@@ -36,7 +36,10 @@ class DeleteItem extends Component {
           <button
             onClick={() => {
               if (confirm("Are you sure you want to delete this item?")) {
-                deleteItem();
+                //TODO use better UI than alerts, such as Apollo box
+                deleteItem().catch(err => {
+                  alert(err.message);
+                });
               }
             }}
           >
