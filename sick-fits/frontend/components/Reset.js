@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Mutation } from "react-apollo";
 import gql from "graphql-tag";
 import Proptypes from "prop-types";
+import Router from "next/router";
 
 import Form from "./styles/Form";
 import Error from "./ErrorMessage";
