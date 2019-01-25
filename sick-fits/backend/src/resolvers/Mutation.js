@@ -46,12 +46,23 @@ const Mutations = {
     );
   },
   async deleteItem(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error("You must be logged in to delete an item!");
+    }
     const where = { id: args.id };
     //1. find item
-    const item = await ctx.db.query.item({ where }, `{id, title}`);
+    const item = await ctx.db.query.item({ where }, `{id title user{ id }}`);
     //2. Check if they own that item or have the permissions
-    //TODO
-    //3. Delete it!
+    const ownsItem = item.user.id === ctx.request.userId;
+    const hasPermissions = ctx.request.user.permissions.some(permission =>
+      ["ADMIN", "ITEMDELETE"].includes(permission)
+    );
+    console.log("ownsItem", ownsItem);
+    console.log("hasPermissions", hasPermissions);
+    if (!ownsItem && hasPermissions) {
+      throw new Error("You do not have permission to delete items");
+    }
+    // 3. Delete it!
     return ctx.db.mutation.deleteItem({ where }, info);
   },
   async signup(parent, args, ctx, info) {
