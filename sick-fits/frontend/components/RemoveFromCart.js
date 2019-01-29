@@ -31,9 +31,20 @@ class RemoveFromCart extends React.Component {
   };
   render() {
     return (
-      <Mutation mutation={REMOVE_FROM_CART_MUTATION}>
+      <Mutation
+        mutation={REMOVE_FROM_CART_MUTATION}
+        variables={{ id: this.props.id }}
+      >
         {(removeFromCart, { loading, error }) => (
-          <BigButton title="Delete Item">&times;</BigButton>
+          <BigButton
+            disabled={loading}
+            title="Delete Item"
+            onClick={() => {
+              removeFromCart().catch(err => alert(err.message));
+            }}
+          >
+            &times;
+          </BigButton>
         )}
       </Mutation>
     );
