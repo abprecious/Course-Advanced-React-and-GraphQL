@@ -21,6 +21,7 @@ class AddToCart extends React.Component {
         mutation={ADD_TO_CART_MUTATION}
         variables={{ id }}
         refetchQueries={[{ query: CURRENT_USER_QUERY }]}
+        //TODO add optimisticResponse such as removeFromCart
       >
         {(addToCart, { loading }) => (
           <button onClick={addToCart} disabled={loading}>
