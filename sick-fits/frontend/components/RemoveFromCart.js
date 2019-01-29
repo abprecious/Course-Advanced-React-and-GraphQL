@@ -1,4 +1,4 @@
-import React from "React";
+import React from "react";
 import { Mutation } from "react-apollo";
 import styled from "styled-components";
 import PropTypes from "prop-types";
