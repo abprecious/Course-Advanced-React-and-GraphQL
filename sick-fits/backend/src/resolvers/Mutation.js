@@ -213,29 +213,37 @@ const Mutations = {
     );
   },
   async addToCart(parent, args, ctx, info) {
-    //check if singed in
+    //check if signed in
     const { userId } = ctx.request;
-    if (!user.Id) {
+    if (!userId) {
       throw new Error("You must be signed in to add an item to your cart");
     }
     //query the users current cart
-    const [existingCartItem] = ctx.db.query.cartItems({
-      user: { id: userId },
-      item: { id: args.id }
+    const [existingCartItem] = await ctx.db.query.cartItems({
+      where: { user: { id: userId }, item: { id: args.id } }
     });
     //check if that item is already in their cart and increment by 1
     if (existingCartItem) {
       console.log("this item is already in their cart");
-      return ctx.db.mutation.updateCartItem({
-        where: { id: existingCartItem.id },
-        data: { quantity: existingCartItem.quantity + 1 }
-      });
+      return ctx.db.mutation.updateCartItem(
+        {
+          where: { id: existingCartItem.id },
+          data: { quantity: existingCartItem.quantity + 1 }
+        },
+        info
+      );
     }
     //if not create a new cartItem for that user
-    return ctx.db.mutation.createCartItem({
-      user: { connect: { id: userId } },
-      item: { connect: { id: args.id } }
-    });
+    const cartItem = await ctx.db.mutation.createCartItem(
+      {
+        data: {
+          user: { connect: { id: userId } },
+          item: { connect: { id: args.id } }
+        }
+      },
+      info
+    );
+    return cartItem;
   }
 };
 
