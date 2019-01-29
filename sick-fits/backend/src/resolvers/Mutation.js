@@ -244,6 +244,30 @@ const Mutations = {
       info
     );
     return cartItem;
+  },
+  async removeFromCart(parent, args, ctx, info) {
+    //find the cart item
+    const cartItem = await ctx.db.query.cartItem(
+      {
+        where: {
+          id: args.id
+        }
+      },
+      `{ id, user { id}}`
+    );
+    //Make sure we found an item
+    if (!cartItem) throw new Error("No cart item found");
+    //make sure they own that cart item
+    if (cartItem.user.id !== ctx.request.userId) {
+      throw new Error("You do not own this item!");
+    }
+    //delete that cart item
+    return ctx.db.mutation.deleteCartItem(
+      {
+        where: { id: args.id }
+      },
+      info
+    );
   }
 };
 
