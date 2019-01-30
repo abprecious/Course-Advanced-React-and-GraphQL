@@ -24,7 +24,7 @@ const CartItem = ({ cartItem }) => {
   if (!cartItem.item)
     return (
       <CartItemStyles>
-        <p>Sorry this item is no longer available</p>
+        <p>Sorry an item is no longer available for purchase</p>
         <RemoveFromCart id={cartItem.id} />
       </CartItemStyles>
     );
