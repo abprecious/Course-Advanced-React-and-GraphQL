@@ -284,7 +284,7 @@ const Mutations = {
         cart {
           id
           quantity
-          item { id title description image price}
+          item { id title description image largeImage price}
         }
       }`
     );
