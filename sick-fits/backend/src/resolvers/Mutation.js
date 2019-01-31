@@ -61,6 +61,7 @@ const Mutations = {
     if (!ownsItem && hasPermissions) {
       throw new Error("You do not have permission to delete items");
     }
+    //TODO delete all cart items that contain this item
     // 3. Delete it!
     return ctx.db.mutation.deleteItem({ where }, info);
   },
@@ -301,9 +302,37 @@ const Mutations = {
       statement_descriptor: "Sick Fits"
     });
     // convert the CartItems to OrderItems
+    const orderItems = user.cart.map(cartItem => {
+      const orderItem = {
+        ...cartItem.item,
+        quantity: cartItem.quantity,
+        user: {
+          connect: { id: userId }
+        }
+      };
+      delete orderItem.id;
+      return orderItem;
+    });
     // create the order
+    const order = await ctx.db.mutation.createOrder({
+      data: {
+        total: charge.amount,
+        charge: charge.id,
+        user: {
+          connect: { id: userId }
+        },
+        items: { create: orderItems }
+      }
+    });
     // Clean up - clear the users cart, delete cartItems
+    const cartItemIds = user.cart.map(cartItem => cartItem.id);
+    await ctx.db.mutation.deleteManyCartItems({
+      where: {
+        id_in: cartItemIds
+      }
+    });
     // return the Order to the client
+    return order;
   }
 };
 
