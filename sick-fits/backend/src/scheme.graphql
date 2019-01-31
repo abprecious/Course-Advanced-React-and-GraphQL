@@ -40,6 +40,7 @@ type Query {
   itemsConnection(where: ItemWhereUniqueInput): ItemConnection!
   me: User
   users: [User]!
+  order(id: ID!): Order
 }
 
 # Prevents access to restricted fields on the frontend by re-defining it in yoga
