@@ -61,7 +61,15 @@ const Mutations = {
     if (!ownsItem && hasPermissions) {
       throw new Error("You do not have permission to delete items");
     }
-    //TODO delete all cart items that contain this item
+    // delete all cart items that contain this item
+    await ctx.db.mutation.deleteManyCartItems(
+      {
+        where: {
+          item: { id: args.id }
+        }
+      },
+      info
+    );
     // 3. Delete it!
     return ctx.db.mutation.deleteItem({ where }, info);
   },
