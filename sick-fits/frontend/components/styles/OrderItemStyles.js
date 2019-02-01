@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 const OrderItemStyles = styled.li`
   box-shadow: ${props => props.theme.bs};
@@ -19,7 +19,7 @@ const OrderItemStyles = styled.li`
     margin-top: 1rem;
     img {
       height: 200px;
-      object-fit: cover;
+      object-fit: contain;
       width: 100%;
     }
   }

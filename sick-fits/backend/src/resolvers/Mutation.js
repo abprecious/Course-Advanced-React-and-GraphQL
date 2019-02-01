@@ -5,6 +5,7 @@ const { promisify } = require("util");
 
 const { hasPermission } = require("../utils");
 const { transport, makeANiceEmail } = require("../mail");
+const stripe = require("../stripe");
 
 const Mutations = {
   async createItem(parent, args, ctx, info) {
@@ -60,6 +61,7 @@ const Mutations = {
     if (!ownsItem && hasPermissions) {
       throw new Error("You do not have permission to delete items");
     }
+    //TODO delete all cart items that contain this item
     // 3. Delete it!
     return ctx.db.mutation.deleteItem({ where }, info);
   },
@@ -267,6 +269,70 @@ const Mutations = {
       },
       info
     );
+  },
+  async createOrder(parent, args, ctx, info) {
+    // query the current user and make sure they are signed in
+    const { userId } = ctx.request;
+    if (!userId)
+      throw new Error("You must be signed in to complete this order");
+    const user = await ctx.db.query.user(
+      { where: { id: userId } },
+      `{
+        id
+        name
+        email
+        cart {
+          id
+          quantity
+          item { id title description image largeImage price}
+        }
+      }`
+    );
+    // recalculate the total for the price to avoid any frudelent changes in the frontend
+    const amount = user.cart.reduce(
+      (tally, cartItem) => tally + cartItem.item.price * cartItem.quantity,
+      0
+    );
+    // create the stripe charge (turn token into $$$)
+    const charge = await stripe.charges.create({
+      amount: amount,
+      currency: "USD",
+      source: args.token,
+      description: `Payment for ${user.name}'s order`,
+      statement_descriptor: "Sick Fits"
+    });
+    // convert the CartItems to OrderItems
+    const orderItems = user.cart.map(cartItem => {
+      const orderItem = {
+        ...cartItem.item,
+        quantity: cartItem.quantity,
+        user: {
+          connect: { id: userId }
+        }
+      };
+      delete orderItem.id;
+      return orderItem;
+    });
+    // create the order
+    const order = await ctx.db.mutation.createOrder({
+      data: {
+        total: charge.amount,
+        charge: charge.id,
+        user: {
+          connect: { id: userId }
+        },
+        items: { create: orderItems }
+      }
+    });
+    // Clean up - clear the users cart, delete cartItems
+    const cartItemIds = user.cart.map(cartItem => cartItem.id);
+    await ctx.db.mutation.deleteManyCartItems({
+      where: {
+        id_in: cartItemIds
+      }
+    });
+    // return the Order to the client
+    return order;
   }
 };
 
