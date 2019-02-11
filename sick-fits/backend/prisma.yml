@@ -1,8 +1,9 @@
-endpoint: ${env:PRISMA_ENDPOINT}
+#endpoint: ${env:PRISMA_ENDPOINT}
+endpoint: https://cbm-ecomm-prod-a5287b25ce.herokuapp.com/cbm-ecomm-prod/prod
 datamodel: datamodel.prisma
-# secret: ${env:PRISMA_SECRET}
+secret: ${env:PRISMA_SECRET}
 
 #to deploy in CLI: prisma deploy --env-file variables.env
 hooks:
-    post-deploy:
-        - graphql get-schema -p prisma
+  post-deploy:
+    - graphql get-schema -p prisma
