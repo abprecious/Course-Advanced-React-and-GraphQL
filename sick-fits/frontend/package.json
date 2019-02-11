@@ -11,6 +11,9 @@
     "test-win": "SET NODE_ENV=test&& jest --watch",
     "heroku-postbuild": "next build"
   },
+  "engines": {
+    "node": "v8.x"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
