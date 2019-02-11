@@ -35,7 +35,7 @@ Array [
       <p>
         Page 
         1
-         of
+         of 
         <span
           className="totalPages"
         >
@@ -98,7 +98,7 @@ Array [
     <p>
       Page 
       1
-       of
+       of 
       <span
         className="totalPages"
       >
