@@ -67,6 +67,8 @@ class TakeMyMoney extends React.Component {
       <Composed>
         {({ user, toggleCart, createOrder }) => {
           const me = user.data.me;
+          const loading = user.loading;
+          if (loading) return null;
           if (!me) return null;
           return (
             <StripeCheckout
@@ -89,3 +91,4 @@ class TakeMyMoney extends React.Component {
 }
 
 export default TakeMyMoney;
+export { CREATE_ORDER_MUTATION };
